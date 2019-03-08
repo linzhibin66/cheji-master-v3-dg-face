@@ -110,7 +110,7 @@ public class LoginStudentActivity extends BaseInitActivity implements View.OnCli
     String yzmm;
     RfidUtil rfid = new RfidUtil();
     private final Object mSync = new Object();
-
+    float sbd;//人脸识别度
     View layout_showphoto;//拍照框
     BroadcastReceiver receiver;//下载广播
 
@@ -157,7 +157,7 @@ public class LoginStudentActivity extends BaseInitActivity implements View.OnCli
                 String sql="select * from tsfrz where uuid=? and lx=?";
                 String[] params={xyuid,"4"};
                 ArrayList<SfrzR> list= DbHandle.queryTsfrz(sql,params);
-                if(list.size()==0){
+                if(list==null||list.size()==0){
                     if(ZdUtil.pdNetwork()&&NettyConf.constate==1) {
                         ZdUtil.sendSfrz(xyuid,"4");
                     }else {
@@ -234,6 +234,7 @@ public class LoginStudentActivity extends BaseInitActivity implements View.OnCli
         //保存教练信息
         stusp = getSharedPreferences("student", Context.MODE_PRIVATE); //私有数据
         zdcssp = getSharedPreferences("zdcs", Context.MODE_PRIVATE);
+        sbd=Float.parseFloat(zdcssp.getString("003F","0.94f"));
         stuedit = stusp.edit();//获取编辑器
         View layout_back = findViewById(R.id.layout_back);
         TextView tv_title = (TextView) findViewById(R.id.tv_title);//标题
@@ -892,6 +893,7 @@ public class LoginStudentActivity extends BaseInitActivity implements View.OnCli
         if(zp==null||zp.equals("")){
             Toast.makeText(context,"没有照片下载有效路径",Toast.LENGTH_SHORT).show();
             isback=true;
+            closeCamera2();
             return;
         }
         final String sfzh = xyxx.getSfzh();
@@ -1375,6 +1377,7 @@ public class LoginStudentActivity extends BaseInitActivity implements View.OnCli
                                         timer11.cancel();
                                         jisi=0;
                                         Speaking.in("照片特征值保存失败");
+                                        isback=true;
                                     }
 
                                 }
@@ -1384,12 +1387,14 @@ public class LoginStudentActivity extends BaseInitActivity implements View.OnCli
                             //照片不错在
                             Log.e("TAG","学员照片下载失败1");
                             Speaking.in("学员照片下载失败");
+                            isback=true;
                         }
 
                     }else {
                         isback=true;
                         Log.e("TAG","下载学员照片失败2");
                         Speaking.in("学员照片下载失败");
+                        isback=true;
                     }
                 }
             };
@@ -1510,11 +1515,11 @@ public class LoginStudentActivity extends BaseInitActivity implements View.OnCli
             Log.e("TAG","获取抓拍照片轮廓结果=" + ret);
             if(ret==true&&faceResult!=null&&faceResult.size()>0){
 
-                String MatchName = FaceDet.FaceDetectMuti(newcameraurl,Float.parseFloat(zdcssp.getString("003F","0.94f")));
+                String MatchName = FaceDet.FaceDetectMuti(newcameraurl,sbd);
                 Log.e("TAG","比对照片名字轮廓结果=" + MatchName);
                 Log.e("TAG","原始身份证号=" + sfzh);
 
-                if(StringUtils.isNotEmpty(MatchName)){
+                if(StringUtils.isNotEmpty(MatchName)&&MatchName.equals(sfzh)){
                     bdpic=newcameraurl;
                     return true;
                 }else {
@@ -1570,7 +1575,18 @@ public class LoginStudentActivity extends BaseInitActivity implements View.OnCli
         });
     }
 
-
+    /**
+     * 关闭拍照预览框
+     * */
+    public void closeCamera2(){
+        if(mUSBMonitor.isRegistered()){
+            //注册了
+            releaseCameraL();
+            mUSBMonitor.unregister();
+        }
+        layout_showphoto.setVisibility(View.INVISIBLE);
+        ZdUtil.ispz=false;
+    }
     /**
      * 返回键监听
      * */

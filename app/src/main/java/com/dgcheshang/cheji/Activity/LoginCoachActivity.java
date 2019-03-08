@@ -104,6 +104,7 @@ public class LoginCoachActivity extends BaseInitActivity implements View.OnClick
     SfrzR jlxx;
     String yzmm;
     SharedPreferences coachsp,zdcssp;
+    float sbd;//识别度
     private final Object mSync = new Object();
 
     View layout_showphoto;//拍照框
@@ -149,7 +150,7 @@ public class LoginCoachActivity extends BaseInitActivity implements View.OnClick
                 String sql="select * from tsfrz where uuid=? and lx=?";
                 String[] params={jluid,"1"};
                 ArrayList<SfrzR> list= DbHandle.queryTsfrz(sql,params);
-                if(list.size()==0){
+                if(list==null||list.size()==0){
                     if(ZdUtil.pdNetwork()&&NettyConf.constate==1) {
                         ZdUtil.sendSfrz(jluid, "1");
                     }else {
@@ -194,7 +195,6 @@ public class LoginCoachActivity extends BaseInitActivity implements View.OnClick
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.e("TAG","onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_coach);
         NettyConf.handlersmap.put("logincoach",handler);
@@ -229,6 +229,7 @@ public class LoginCoachActivity extends BaseInitActivity implements View.OnClick
         //保存教练信息
         coachsp = getSharedPreferences("coach", Context.MODE_PRIVATE);
         zdcssp = getSharedPreferences("zdcs", Context.MODE_PRIVATE);
+        sbd=Float.parseFloat(zdcssp.getString("003F","0.96f"));//人脸识别度
         editor = coachsp.edit();//获取编辑器
         View layout_back = findViewById(R.id.layout_back);//返回
         tv_title = (TextView) findViewById(R.id.tv_title);//标题
@@ -656,6 +657,7 @@ public class LoginCoachActivity extends BaseInitActivity implements View.OnClick
         if(zp==null||zp.equals("")){
          Toast.makeText(context,"没有照片下载有效路径",Toast.LENGTH_SHORT).show();
             isback=true;
+            closeCamera2();
             return;
         }
         final String sfzh = jlxx.getSfzh();
@@ -1135,6 +1137,8 @@ public class LoginCoachActivity extends BaseInitActivity implements View.OnClick
                                         timer11.cancel();
                                         jisi=0;
                                         Speaking.in("照片特征值保存失败");
+                                        isback=true;
+
                                     }
 
                                 }
@@ -1144,6 +1148,7 @@ public class LoginCoachActivity extends BaseInitActivity implements View.OnClick
                             //照片不错在
                             Log.e("TAG","教练员照片下载失败1");
                             Speaking.in("教练员照片下载失败");
+                            isback=true;
                         }
 
 
@@ -1152,6 +1157,7 @@ public class LoginCoachActivity extends BaseInitActivity implements View.OnClick
                         isback=true;
                         Log.e("TAG","教练员照片下载失败2");
                         Speaking.in("教练员照片下载失败");
+                        isback=true;
                     }
                 }
             };
@@ -1251,9 +1257,9 @@ public class LoginCoachActivity extends BaseInitActivity implements View.OnClick
             Log.e("TAG","获取抓拍照片轮廓结果=" + ret);
             if(ret==true &&faceResult!=null&&faceResult.size()>0){
 
-                String MatchName = FaceDet.FaceDetectMuti(newcameraurl, Float.parseFloat(zdcssp.getString("003F","0.94f")));
+                String MatchName = FaceDet.FaceDetectMuti(newcameraurl,sbd);
                 Log.e("TAG","比对照片名字轮廓结果=" + MatchName);
-                if(StringUtils.isNotEmpty(MatchName)){
+                if(StringUtils.isNotEmpty(MatchName)&&MatchName.equals(sfzh)){
                     bdpic=newcameraurl;
                     return true;
                 }else {
@@ -1307,6 +1313,20 @@ public class LoginCoachActivity extends BaseInitActivity implements View.OnClick
             }
         });
     }
+
+    /**
+     * 关闭拍照预览框
+     * */
+    public void closeCamera2(){
+        if(mUSBMonitor.isRegistered()){
+            //注册了
+            releaseCameraL();
+            mUSBMonitor.unregister();
+        }
+        layout_showphoto.setVisibility(View.INVISIBLE);
+        ZdUtil.ispz=false;
+    }
+
 
 
 

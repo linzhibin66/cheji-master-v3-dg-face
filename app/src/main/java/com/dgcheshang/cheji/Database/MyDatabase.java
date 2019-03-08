@@ -137,9 +137,7 @@ public class MyDatabase extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if(NettyConf.debug) {
             Log.e("TAG", "老版本：" + oldVersion + ";新版本：" + newVersion);
-        }
             //创建注册成功后存值
             db.execSQL( "CREATE TABLE IF NOT EXISTS "+
                     DbConstants.T_DZWL+ "("+
@@ -163,6 +161,25 @@ public class MyDatabase extends SQLiteOpenHelper {
                     "sj integer"+//时间
                     ")"
             );
+            //删除该表
+            db.execSQL("drop table " + DbConstants.T_SFRZ);
+        //创建注册成功后存值
+        db.execSQL( "CREATE TABLE IF NOT EXISTS "+
+                DbConstants.T_SFRZ+ "("+
+                "id integer primary key autoincrement,"+//多媒体数据主键
+                "uuid varchar(10),"+//对应内码
+                "lx varchar(2),"+//人员类型
+                "tybh varchar(32),"+//统一编号
+                "sfzh varchar(32),"+//身份证号
+                "cx varchar(4),"+//车型
+                "xx text,"+//身份信息
+                "xm varchar(32),"+//身份信息
+                "sj integer,"+//时间
+                "zp text"+//照片
+                ")"
+        );
+
+//            db.execSQL( "ALTER TABLE "+ DbConstants.T_SFRZ +" ADD COLUMN "+"zp text");
 
     }
 }

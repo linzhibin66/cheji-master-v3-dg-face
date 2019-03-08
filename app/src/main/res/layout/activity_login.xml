@@ -40,7 +40,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
                 android:textSize="23sp"
-                android:text="主菜单"
+                android:text="实操培训"
                 android:id="@+id/textView"
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true" />

@@ -6,7 +6,7 @@ package com.dgcheshang.cheji.Database;
 
 public class DbConstants {
     public static final String DB_NAME = "cheji.db";//数据库名称
-    public static final int DB_VERSION = 6;//数据库版本号
+    public static final int DB_VERSION = 7;//数据库版本号
     public static final String T_XSJL = "xsjl";//学时记录
     public static final String T_ZPSC = "zpsc";//照片上传初始化数据
     public static final String T_ZPDATA = "zpdata";//照片上传初始化数据

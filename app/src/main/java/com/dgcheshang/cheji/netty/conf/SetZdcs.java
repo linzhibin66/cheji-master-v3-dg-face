@@ -25,8 +25,8 @@ public class SetZdcs {
         edit.putString("0010","5");//主服务器APN，无线通信拨号访问点。若网络制式为CDMA，则该处为PPP拨号号码
         edit.putString("0011","0");//主服务器无线通信拨号用户名
         edit.putString("0012","0");//主服务器无线通信拨号密码
-//        edit.putString("0013","14.17.70.172");//主服务器地址，IP或域名
-        edit.putString("0013","192.168.8.50");//主服务器地址，IP或域名
+        edit.putString("0013","14.17.70.172");//主服务器地址，IP或域名
+//        edit.putString("0013","192.168.8.50");//主服务器地址，IP或域名
         edit.putString("0014","0");//备份服务器APN，无线通信拨号访问点
         edit.putString("0015","0");//备份服务器无线通信拨号用户名
         edit.putString("0016","0");//备份服务器无线通信拨号密码

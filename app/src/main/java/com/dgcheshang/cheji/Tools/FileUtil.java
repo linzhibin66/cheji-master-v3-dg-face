@@ -1,5 +1,8 @@
 package com.dgcheshang.cheji.Tools;
 
+import android.os.Environment;
+import android.text.TextUtils;
+
 import com.dgcheshang.cheji.netty.conf.NettyConf;
 
 import java.io.File;
@@ -9,6 +12,11 @@ import java.io.File;
  */
 
 public class FileUtil {
+    // 根目录
+    public static final String ROOT1 = Environment.getExternalStorageDirectory().getAbsolutePath();
+    // 原始图片文件夹
+    public static final String IMAGE_DIR2 = "jlyxypic";
+    public static final String DEFAULT_IMG_DIR2 = getRoot() + IMAGE_DIR2;
 
     //判断文件是否存在
     public static boolean fileIsExists(String strFile)
@@ -96,5 +104,32 @@ public class FileUtil {
                     }
                 }
             }
+    }
+
+
+    /** 删除单个文件
+     * @param filePath 要删除的文件的文件名
+     * @return 单个文件删除成功返回true，否则返回false
+     */
+    public static boolean deleteOneFile(String filePath) {
+        File file = new File(filePath);
+        // 如果文件路径所对应的文件存在，并且是一个文件，则直接删除
+        if (file.exists() && file.isFile()) {
+            if (file.delete()) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    public static String getRoot() {
+        String path = FileUtil.ROOT1;
+        if (TextUtils.isEmpty(path) || path.contains("null")) {
+            throw new IllegalStateException("设备存储路径未初始化:" + path);
+        }
+        return path + File.separator;
     }
 }

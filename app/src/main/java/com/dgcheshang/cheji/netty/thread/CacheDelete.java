@@ -5,8 +5,12 @@ import android.util.Log;
 import com.dgcheshang.cheji.CjApplication;
 import com.dgcheshang.cheji.Database.DbHandle;
 import com.dgcheshang.cheji.Database.MyDatabase;
+import com.dgcheshang.cheji.Tools.FileUtil;
 import com.dgcheshang.cheji.netty.conf.NettyConf;
+import com.dgcheshang.cheji.netty.serverreply.SfrzR;
 import com.dgcheshang.cheji.netty.util.ZdUtil;
+
+import java.util.ArrayList;
 
 /**
  * Created by Administrator on 2017/6/30.
@@ -22,6 +26,12 @@ public class CacheDelete extends Thread{
             Log.e("TAG","删除开始时间："+l);
         }
         String[] params={String.valueOf(l)};
+        //删除保存的原始图片
+        ArrayList<SfrzR> list= DbHandle.queryTsfrz("select * from tsfrz where sj < ?",params);
+        for(int i=0;i<list.size();i++){
+            String sfzh = list.get(i).getSfzh();
+            FileUtil.deleteOneFile(FileUtil.DEFAULT_IMG_DIR2+sfzh+".jpg");
+        }
         int num= DbHandle.deleteData("tsfrz", "sj < ?",params);
         if(NettyConf.debug){
             Log.e("TAG","清除认证信息数量："+num);
